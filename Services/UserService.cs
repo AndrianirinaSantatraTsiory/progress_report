@@ -1,7 +1,9 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProgressReport.data;
 using ProgressReport.DTO;
+using ProgressReport.mappers;
 using ProgressReport.models;
 
 namespace ProgressReport.Services
@@ -10,6 +12,8 @@ namespace ProgressReport.Services
     {
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
+
+        private readonly IMapper _mapper;
 
         public UserService(AppDbContext context, IPasswordHasher<User> passwordHasher)
         {
@@ -31,20 +35,14 @@ namespace ProgressReport.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new UserDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.ServiceId);
+            return UserMapper.ToDto(user);
         }
 
         public async Task<IEnumerable<UserDto>> GetAll()
         {
             return await _context.Users
                 .AsNoTracking()
-                .Select(u => new UserDto(
-                    u.Id,
-                    u.FullName,
-                    u.Email,
-                    u.Role.ToString(),
-                    u.ServiceId
-                ))
+                .Select(u => UserMapper.ToDto(u))
                 .ToListAsync();
         }
 
@@ -53,7 +51,7 @@ namespace ProgressReport.Services
             var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return null;
 
-            return new UserDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.ServiceId);
+            return UserMapper.ToDto(user);
         }
     }
 }

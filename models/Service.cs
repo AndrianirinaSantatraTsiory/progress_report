@@ -7,7 +7,7 @@ namespace ProgressReport.models
     [Table("services")]
     public class Service
     {
-       [Key]
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 

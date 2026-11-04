@@ -13,6 +13,8 @@ builder.Services.AddScoped<ProgressReport.Services.IUserService, ProgressReport.
 
 builder.Services.AddControllers();
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
