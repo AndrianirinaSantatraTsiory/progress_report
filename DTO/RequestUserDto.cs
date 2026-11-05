@@ -1,6 +1,6 @@
 namespace ProgressReport.DTO
 {
-    public record CreateUserDto
+    public record RequestUserDto
     (
         string FullName,
         string Email,

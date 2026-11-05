@@ -20,7 +20,7 @@ namespace ProgressReport.Services
             _context = context;
             _passwordHasher = passwordHasher;
         }
-        public async Task<UserDto> Create(CreateUserDto dto)
+        public async Task<UserDto> Create(RequestUserDto dto)
         {
             var user = new User
             {
@@ -48,10 +48,35 @@ namespace ProgressReport.Services
 
         public async Task<UserDto?> GetById(long id)
         {
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null) return null;
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            return UserMapper.ToDto(user);
+        }
+
+        public async Task<UserDto?> Update(long id, RequestUserDto dto)
+        {
+            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.Role = Enum.Parse<UserRole>(dto.Role, true);
+            user.ServiceId = dto.ServiceId;
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                user.Password = _passwordHasher.HashPassword(user, dto.Password);
+            }
+
+            await _context.SaveChangesAsync();
 
             return UserMapper.ToDto(user);
+        }
+
+        public async Task<bool> Delete(long id)
+        {
+            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

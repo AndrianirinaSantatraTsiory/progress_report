@@ -14,7 +14,7 @@ namespace ProgressReport.mappers
     {
         CreateMap<User, UserDto>();
         
-        CreateMap<CreateUserDto, User>();
+        CreateMap<RequestUserDto, User>();
     }
     }
 }

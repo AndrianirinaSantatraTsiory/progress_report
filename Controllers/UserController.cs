@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProgressReport.DTO;
 using ProgressReport.Services;
@@ -20,26 +16,55 @@ namespace ProgressReport.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
+        public async Task<ActionResult<ResponseModel<IEnumerable<UserDto>>>> GetAll()
         {
             var users = await _userService.GetAll();
-            return Ok(users);
+            return Ok(new ResponseModel<IEnumerable<UserDto>>("Utilisateurs récupérés avec succès",users));
         }
 
         [HttpGet("{id:long}")]
-        public async Task<ActionResult<UserDto>> GetById(long id)
+        public async Task<ActionResult<ResponseModel<UserDto>>> GetById(long id)
         {
             var user = await _userService.GetById(id);
-            if (user == null) return NotFound();
-
-            return Ok(user);
+            return Ok(new ResponseModel<UserDto>("Utilisateur récupéré avec succès",user));
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto dto)
+        public async Task<ActionResult<ResponseModel<UserDto>>> Create([FromBody] RequestUserDto dto)
         {
             var createdUser = await _userService.Create(dto);
-            return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
+
+            var response = new ResponseModel<UserDto>(
+                Message: "Utilisateur créé avec succès",
+                Data: createdUser
+            );
+
+            return StatusCode(StatusCodes.Status201Created, new ResponseModel<UserDto>("Utilisateur créé avec succès", createdUser));
+        }
+
+        [HttpPut("{id:long}")]
+        public async Task<ActionResult<ResponseModel<UserDto>>> Update(long id, [FromBody] RequestUserDto dto)
+        {
+            var updatedUser = await _userService.Update(id, dto);
+
+            var response = new ResponseModel<UserDto>(
+                Message: "Utilisateur mis à jour avec succès",
+                Data: updatedUser
+            );
+            return Ok(response);
+        }
+
+        [HttpDelete("{id:long}")]
+        public async Task<ActionResult<ResponseModel<object?>>> Delete(long id)
+        {
+            await _userService.Delete(id);
+           
+
+            var response = new ResponseModel<object?>(
+                Message: "Utilisateur supprimé avec succès",
+                Data: null
+            );
+            return Ok(response);
         }        
     }
 }
