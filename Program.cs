@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProgressReport.data;
+using ProgressReport.DTO;
 using ProgressReport.Middlewares;
 using ProgressReport.models;
+using ProgressReport.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +13,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<ProgressReport.Services.IUserService, ProgressReport.Services.UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IService, ServiceImplementation>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+        {
+            // Personnalise la réponse 400 lorsque la validation du DTO échoue
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                var errors = context.ModelState
+                    .Where(e => e.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                var response = new ResponseModel<object>(
+                    Message: "Erreur de validation des données.",
+                    Data: errors
+                );
+                return new BadRequestObjectResult(response);
+            };
+        });
 
 builder.Services.AddAutoMapper(typeof(Program));
 
