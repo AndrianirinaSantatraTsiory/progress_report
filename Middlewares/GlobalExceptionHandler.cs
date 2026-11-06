@@ -12,9 +12,15 @@ namespace ProgressReport.Middlewares
         {
             var statusCode = StatusCodes.Status500InternalServerError;
             var message = exception.Message;
-            if (exception is KeyNotFoundException)
+            switch (exception)
             {
-                statusCode = StatusCodes.Status404NotFound;
+                case KeyNotFoundException:
+                    statusCode = StatusCodes.Status404NotFound;
+                    break;
+
+                case InvalidOperationException:
+                    statusCode = StatusCodes.Status409Conflict; 
+                    break;
             }
 
             ResponseModel<object> response = new(message, null);

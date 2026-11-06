@@ -17,6 +17,12 @@ namespace ProgressReport.Services
 
         public async Task<ServiceDto> Create(RequestServiceDto dto)
         {
+            bool nameExists = await _context.Services.AnyAsync(s => s.Name == dto.Name);
+            if (nameExists)
+            {
+                throw new InvalidOperationException($"Un service avec le nom '{dto.Name}' existe déjà.");
+            }
+
             var service = new Service
             {
                 Name = dto.Name
@@ -50,6 +56,12 @@ namespace ProgressReport.Services
         {
             var service = await _context.Services.FindAsync(id) 
                 ?? throw new KeyNotFoundException($"Le service avec l'ID {id} est introuvable.");
+
+            bool nameExists = await _context.Services.AnyAsync(s => s.Name == dto.Name && s.Id != id);
+            if (nameExists)
+            {
+                throw new InvalidOperationException($"Un autre service utilise déjà le nom '{dto.Name}'.");
+            }
 
             service.Name = dto.Name;
 

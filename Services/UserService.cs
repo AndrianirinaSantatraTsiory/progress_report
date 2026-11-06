@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProgressReport.data;
@@ -13,15 +12,27 @@ namespace ProgressReport.Services
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        private readonly IMapper _mapper;
-
         public UserService(AppDbContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
             _passwordHasher = passwordHasher;
         }
+
         public async Task<UserDto> Create(RequestUserDto dto)
         {
+            bool emailExists = await _context.Users.AnyAsync(u => u.Email == dto.Email);
+            if (emailExists)
+            {
+                throw new InvalidOperationException($"Un utilisateur avec l'email '{dto.Email}' existe déjà.");
+            }
+
+            // 2. Contrôle de l'existence du ServiceId
+            bool serviceExists = await _context.Services.AnyAsync(s => s.Id == dto.ServiceId);
+            if (!serviceExists)
+            {
+                throw new KeyNotFoundException($"Le service n'existe plus");
+            }
+
             var user = new User
             {
                 FullName = dto.FullName,
@@ -48,13 +59,28 @@ namespace ProgressReport.Services
 
         public async Task<UserDto?> GetById(long id)
         {
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id) 
+                ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
             return UserMapper.ToDto(user);
         }
 
         public async Task<UserDto?> Update(long id, RequestUserDto dto)
         {
-            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            var user = await _context.Users.FindAsync(id) 
+                ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+
+            bool emailExists = await _context.Users.AnyAsync(u => u.Email == dto.Email && u.Id != id);
+            if (emailExists)
+            {
+                throw new InvalidOperationException($"Un autre utilisateur utilise déjà l'email '{dto.Email}'.");
+            }
+
+            bool serviceExists = await _context.Services.AnyAsync(s => s.Id == dto.ServiceId);
+            if (!serviceExists)
+            {
+                throw new KeyNotFoundException($"Le service n'existe plus");
+            }
+
             user.FullName = dto.FullName;
             user.Email = dto.Email;
             user.Role = Enum.Parse<UserRole>(dto.Role, true);
@@ -72,7 +98,9 @@ namespace ProgressReport.Services
 
         public async Task<bool> Delete(long id)
         {
-            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            var user = await _context.Users.FindAsync(id) 
+                ?? throw new KeyNotFoundException($"L'utilisateur avec l'ID {id} est introuvable.");
+            
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
