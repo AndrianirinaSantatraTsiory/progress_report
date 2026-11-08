@@ -1,4 +1,5 @@
 using ProgressReport.DTO;
+using ProgressReport.models;
 
 namespace ProgressReport.Services
 {
@@ -9,5 +10,6 @@ namespace ProgressReport.Services
         Task<UserDto> Create(RequestUserDto dto);
         Task<UserDto?> Update(long id, RequestUserDto dto);
         Task<bool> Delete(long id);
+        Task<User?> GetUserEntityByEmail(string email);
     }
 }

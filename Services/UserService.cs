@@ -106,5 +106,12 @@ namespace ProgressReport.Services
 
             return true;
         }
+
+        public async Task<User?> GetUserEntityByEmail(string email)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
 }

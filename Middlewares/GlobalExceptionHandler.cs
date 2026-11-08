@@ -21,6 +21,10 @@ namespace ProgressReport.Middlewares
                 case InvalidOperationException:
                     statusCode = StatusCodes.Status409Conflict; 
                     break;
+                
+                case UnauthorizedAccessException:
+                    statusCode = StatusCodes.Status401Unauthorized;
+                    break;
             }
 
             ResponseModel<object> response = new(message, null);

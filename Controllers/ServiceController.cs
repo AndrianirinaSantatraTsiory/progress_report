@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProgressReport.DTO;
 using ProgressReport.Services;
 
 namespace ProgressReport.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("services")]
     public class ServiceController : ControllerBase
@@ -15,6 +17,7 @@ namespace ProgressReport.Controllers
             _serviceService = serviceService;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<ActionResult<ResponseModel<IEnumerable<ServiceDto>>>> GetAll()
         {
@@ -29,6 +32,7 @@ namespace ProgressReport.Controllers
             return Ok(new ResponseModel<ServiceDto>("Service récupéré avec succès", service));
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpPost]
         public async Task<ActionResult<ResponseModel<ServiceDto>>> Create([FromBody] RequestServiceDto dto)
         {
@@ -39,6 +43,7 @@ namespace ProgressReport.Controllers
             return StatusCode(StatusCodes.Status201Created, response);
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpPut("{id:long}")]
         public async Task<ActionResult<ResponseModel<ServiceDto>>> Update(long id, [FromBody] RequestServiceDto dto)
         {
@@ -48,6 +53,7 @@ namespace ProgressReport.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id:long}")]
         public async Task<ActionResult<ResponseModel<object?>>> Delete(long id)
         {
