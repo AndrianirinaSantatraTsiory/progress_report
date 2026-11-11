@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.vscode/
+.git/
+.env
+Dockerfile
+docker-compose*.yml
+*.md
+appsettings.Development.json

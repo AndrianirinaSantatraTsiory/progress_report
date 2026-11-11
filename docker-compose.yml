@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: progressreport-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: report_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ratsiory004
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+  back:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: report-api
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=report_db;Username=postgres;Password=ratsiory004"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
