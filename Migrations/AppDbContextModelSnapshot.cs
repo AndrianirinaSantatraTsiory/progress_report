@@ -21,7 +21,7 @@ namespace ProgressReport.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ProgressReport.models.Service", b =>
+            modelBuilder.Entity("ProgressReport.models.Direction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,7 +36,7 @@ namespace ProgressReport.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("services");
+                    b.ToTable("directions");
                 });
 
             modelBuilder.Entity("ProgressReport.models.User", b =>
@@ -46,6 +46,10 @@ namespace ProgressReport.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("DirectionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("direction_id");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -66,30 +70,26 @@ namespace ProgressReport.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("role");
 
-                    b.Property<long?>("ServiceId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("service_id");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("DirectionId");
 
                     b.HasIndex("Email")
                         .IsUnique();
-
-                    b.HasIndex("ServiceId");
 
                     b.ToTable("users");
                 });
 
             modelBuilder.Entity("ProgressReport.models.User", b =>
                 {
-                    b.HasOne("ProgressReport.models.Service", "Service")
+                    b.HasOne("ProgressReport.models.Direction", "Direction")
                         .WithMany("Users")
-                        .HasForeignKey("ServiceId");
+                        .HasForeignKey("DirectionId");
 
-                    b.Navigation("Service");
+                    b.Navigation("Direction");
                 });
 
-            modelBuilder.Entity("ProgressReport.models.Service", b =>
+            modelBuilder.Entity("ProgressReport.models.Direction", b =>
                 {
                     b.Navigation("Users");
                 });

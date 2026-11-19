@@ -28,10 +28,10 @@ namespace ProgressReport.models
         [Column("role")]
         public UserRole Role { get; set; } = UserRole.COLLABORATOR;
 
-        [Column("service_id")]
-        public long? ServiceId { get; set; }
+        [Column("direction_id")]
+        public long? DirectionId { get; set; }
 
-        [ForeignKey("ServiceId")]
-        public Service? Service { get; set; }
+        [ForeignKey("DirectionId")]
+        public Direction? Direction { get; set; }
     }
 }

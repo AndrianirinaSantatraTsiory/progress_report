@@ -3,13 +3,13 @@ using ProgressReport.models;
 
 namespace ProgressReport.mappers
 {
-    public class ServiceMapper
+    public class DirectionMapper
     {
-        public static ServiceDto ToDto(Service service)
+        public static DirectionDto ToDto(Direction service)
         {
             if (service == null) return null!;
 
-            return new ServiceDto(
+            return new DirectionDto(
                 service.Id,
                 service.Name
             );

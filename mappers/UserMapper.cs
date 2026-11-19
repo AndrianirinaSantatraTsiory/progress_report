@@ -14,7 +14,7 @@ namespace ProgressReport.mappers
                 user.FullName,
                 user.Email,
                 user.Role.ToString(),
-                user.ServiceId
+                user.DirectionId
             );
         }   
     }

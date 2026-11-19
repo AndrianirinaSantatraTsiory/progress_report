@@ -38,7 +38,7 @@ namespace ProgressReport.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Role = Enum.Parse<UserRole>(dto.Role, true),
-                ServiceId = dto.ServiceId
+                DirectionId = dto.ServiceId
             };
 
             user.Password = _passwordHasher.HashPassword(user, dto.Password);
@@ -84,7 +84,7 @@ namespace ProgressReport.Services
             user.FullName = dto.FullName;
             user.Email = dto.Email;
             user.Role = Enum.Parse<UserRole>(dto.Role, true);
-            user.ServiceId = dto.ServiceId;
+            user.DirectionId = dto.ServiceId;
 
             if (!string.IsNullOrWhiteSpace(dto.Password))
             {

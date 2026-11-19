@@ -6,16 +6,16 @@ using ProgressReport.models;
 
 namespace ProgressReport.Services
 {
-    public class ServiceImplementation : IService
+    public class DirectionService : IDirectionService
     {
         private readonly AppDbContext _context;
 
-        public ServiceImplementation(AppDbContext context)
+        public DirectionService(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<ServiceDto> Create(RequestServiceDto dto)
+        public async Task<DirectionDto> Create(RequestDirectionDto dto)
         {
             bool nameExists = await _context.Services.AnyAsync(s => s.Name == dto.Name);
             if (nameExists)
@@ -23,7 +23,7 @@ namespace ProgressReport.Services
                 throw new InvalidOperationException($"Un service avec le nom '{dto.Name}' existe déjà.");
             }
 
-            var service = new Service
+            var service = new Direction
             {
                 Name = dto.Name
             };
@@ -31,28 +31,28 @@ namespace ProgressReport.Services
             _context.Services.Add(service);
             await _context.SaveChangesAsync();
 
-            return ServiceMapper.ToDto(service);
+            return DirectionMapper.ToDto(service);
         }
 
-        public async Task<IEnumerable<ServiceDto>> GetAll()
+        public async Task<IEnumerable<DirectionDto>> GetAll()
         {
             return await _context.Services
                 .AsNoTracking()
-                .Select(s => ServiceMapper.ToDto(s))
+                .Select(s => DirectionMapper.ToDto(s))
                 .ToListAsync();
         }
 
-        public async Task<ServiceDto> GetById(long id)
+        public async Task<DirectionDto> GetById(long id)
         {
             var service = await _context.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id) 
                 ?? throw new KeyNotFoundException($"Le service avec l'ID {id} est introuvable.");
 
-            return ServiceMapper.ToDto(service);
+            return DirectionMapper.ToDto(service);
         }
 
-        public async Task<ServiceDto> Update(long id, RequestServiceDto dto)
+        public async Task<DirectionDto> Update(long id, RequestDirectionDto dto)
         {
             var service = await _context.Services.FindAsync(id) 
                 ?? throw new KeyNotFoundException($"Le service avec l'ID {id} est introuvable.");
@@ -67,7 +67,7 @@ namespace ProgressReport.Services
 
             await _context.SaveChangesAsync();
 
-            return ServiceMapper.ToDto(service);
+            return DirectionMapper.ToDto(service);
         }
 
         public async Task<bool> Delete(long id)

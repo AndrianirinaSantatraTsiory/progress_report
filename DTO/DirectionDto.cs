@@ -1,6 +1,6 @@
 namespace ProgressReport.DTO
 {
-    public record ServiceDto
+    public record DirectionDto
     (
         long Id,
         string Name

@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProgressReport.models
 {
-    [Table("services")]
-    public class Service
+    [Table("directions")]
+    public class Direction
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

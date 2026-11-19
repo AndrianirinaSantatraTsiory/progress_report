@@ -6,13 +6,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ProgressReport.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "services",
+                name: "directions",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -21,7 +21,7 @@ namespace ProgressReport.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_services", x => x.Id);
+                    table.PrimaryKey("PK_directions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,28 +34,28 @@ namespace ProgressReport.Migrations
                     email = table.Column<string>(type: "text", nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
                     role = table.Column<int>(type: "integer", nullable: false),
-                    service_id = table.Column<long>(type: "bigint", nullable: true)
+                    direction_id = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_users_services_service_id",
-                        column: x => x.service_id,
-                        principalTable: "services",
+                        name: "FK_users_directions_direction_id",
+                        column: x => x.direction_id,
+                        principalTable: "directions",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_direction_id",
+                table: "users",
+                column: "direction_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_email",
                 table: "users",
                 column: "email",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_users_service_id",
-                table: "users",
-                column: "service_id");
         }
 
         /// <inheritdoc />
@@ -65,7 +65,7 @@ namespace ProgressReport.Migrations
                 name: "users");
 
             migrationBuilder.DropTable(
-                name: "services");
+                name: "directions");
         }
     }
 }
